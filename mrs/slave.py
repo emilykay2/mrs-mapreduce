@@ -40,7 +40,7 @@ import socket
 import threading
 
 from . import bucket
-from . import http
+from . import httpmrs
 from . import registry
 from . import util
 from . import worker
@@ -88,7 +88,7 @@ class Slave(worker.WorkerManager):
 
     def run(self):
         self.start_rpc_server_thread()
-        self.master_rpc = http.TimeoutServerProxy(self.master_url, self.timeout)
+        self.master_rpc = httpmrs.TimeoutServerProxy(self.master_url, self.timeout)
 
         result = self.signin()
         if not result:
@@ -119,7 +119,7 @@ class Slave(worker.WorkerManager):
 
     def start_rpc_server_thread(self):
         rpc_interface = SlaveInterface(self)
-        rpc_server = http.RPCServer(('', 0), rpc_interface)
+        rpc_server = httpmrs.RPCServer(('', 0), rpc_interface)
         _, self.rpc_port = rpc_server.socket.getsockname()
 
         rpc_thread = threading.Thread(target=rpc_server.serve_forever,
@@ -128,7 +128,7 @@ class Slave(worker.WorkerManager):
         rpc_thread.start()
 
     def start_bucket_server_thread(self, default_dir):
-        bucket_server = http.ThreadingBucketServer(('', 0), default_dir)
+        bucket_server = httpmrs.ThreadingBucketServer(('', 0), default_dir)
         _, self.bucket_port = bucket_server.socket.getsockname()
 
         bucket_thread = threading.Thread(target=bucket_server.serve_forever,
@@ -253,7 +253,7 @@ class SlaveInterface(object):
     def __init__(self, slave):
         self.slave = slave
 
-    @http.uses_host
+    @httpmrs.uses_host
     def xmlrpc_start_task(self, op_args, urls, dataset_id, task_index, splits,
             storage, ext, input_ser_names, ser_names, cookie, host=None):
         self.slave.check_cookie(cookie)

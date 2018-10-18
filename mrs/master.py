@@ -27,7 +27,7 @@ import sys
 import threading
 import time
 
-from . import http
+from . import httpmrs
 from . import registry
 from . import computed_data
 from . import runner
@@ -101,7 +101,7 @@ class MasterRunner(runner.TaskRunner):
         self.rpc_interface = MasterInterface(self.slaves, program_hash,
                 self.opts, self.args, self.jobdir)
         port = getattr(self.opts, 'mrs__port', 0)
-        rpc_server = http.ThreadingRPCServer(('', port), self.rpc_interface)
+        rpc_server = httpmrs.ThreadingRPCServer(('', port), self.rpc_interface)
         if port == 0:
             port = rpc_server.server_address[1]
 
@@ -313,7 +313,7 @@ class MasterInterface(object):
         host = request.client.host
         return host
 
-    @http.uses_host
+    @httpmrs.uses_host
     def xmlrpc_signin(self, version, cookie, slave_port, program_hash,
             host=None):
         """Slave reporting for duty.
@@ -337,7 +337,7 @@ class MasterInterface(object):
 
         return (slave.id, host, self.jobdir, self.opts_dict, self.args)
 
-    @http.uses_host
+    @httpmrs.uses_host
     def xmlrpc_ready(self, slave_id, cookie, host=None):
         """Slave is ready for work."""
         slave = self.slaves.get_slave(slave_id, cookie)
@@ -351,7 +351,7 @@ class MasterInterface(object):
                     % (host, slave_id))
             return False
 
-    @http.uses_host
+    @httpmrs.uses_host
     def xmlrpc_done(self, slave_id, dataset_id, source, urls, cookie,
             host=None):
         """Slave is done with the task it was working on.
@@ -370,7 +370,7 @@ class MasterInterface(object):
                     % (host, slave_id))
             return False
 
-    @http.uses_host
+    @httpmrs.uses_host
     def xmlrpc_failed(self, slave_id, dataset_id, task_index, cookie,
             host=None):
         """Slave failed to complete the task it was working on."""
@@ -386,7 +386,7 @@ class MasterInterface(object):
                     % (host, slave_id))
             return False
 
-    @http.uses_host
+    @httpmrs.uses_host
     def xmlrpc_ping(self, slave_id, cookie, host=None):
         """Slave checking if we're still here."""
         slave = self.slaves.get_slave(slave_id, cookie)
@@ -415,7 +415,7 @@ class RemoteSlave(object):
         self.pingdelay = slaves.pingdelay
 
         uri = "http://%s:%s" % (host, port)
-        self._rpc = http.TimeoutServerProxy(uri, slaves.rpc_timeout)
+        self._rpc = httpmrs.TimeoutServerProxy(uri, slaves.rpc_timeout)
         self._rpc_lock = threading.Lock()
 
         self._assignment = None
@@ -526,7 +526,7 @@ class RemoteSlave(object):
                 logger.error('Protocol error in RPC to slave %s: %s' %
                         (self.id, e.errmsg))
                 success = False
-            except http.ConnectionFailed:
+            except httpmrs.ConnectionFailed:
                 logger.error('Connection failed in RPC to slave %s' % self.id)
                 success = False
 
@@ -560,7 +560,7 @@ class RemoteSlave(object):
                 logger.error('Protocol error in remove call to slave %s: %s'
                         % (self.id, e.errmsg))
                 success = False
-            except http.ConnectionFailed:
+            except httpmrs.ConnectionFailed:
                 logger.error('Connection failed in remove call to slave %s' %
                         self.id)
                 success = False
@@ -649,7 +649,7 @@ class RemoteSlave(object):
             logger.error('Protocol error in ping to slave %s: %s'
                     % (self.id, e.errmsg))
             success = False
-        except http.ConnectionFailed:
+        except httpmrs.ConnectionFailed:
             logger.error('Connection failed in ping to slave %s' % self.id)
             success = False
         finally:
@@ -690,7 +690,7 @@ class RemoteSlave(object):
             except ProtocolError as e:
                 logger.error('Protocol error in exit to slave %s: %s'
                         % (self.id, e.errmsg))
-            except http.ConnectionFailed:
+            except httpmrs.ConnectionFailed:
                 logger.error('Connection failed in exit to slave %s' % self.id)
             self._state = 'exited'
             self._rpc = None

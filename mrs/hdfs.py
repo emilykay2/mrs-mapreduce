@@ -40,10 +40,11 @@ import getpass
 import json
 import urllib
 
-try:
-    import httplib
-except ImportError:
-    import http.client as httplib
+# try:
+#     import httplib
+# except ImportError:
+#     import http.client as httplib
+import http.client as httplib
 
 try:
     import urlparse

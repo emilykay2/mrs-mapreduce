@@ -26,7 +26,7 @@ import weakref
 from . import bucket
 from . import computed_data
 from . import datasets
-from . import http
+from . import httpmrs
 from . import registry
 from .serializers import Serializers
 from . import tasks
@@ -268,7 +268,7 @@ def job_process(program_class, opts, args, default_dir, pipe,
     computed.
     """
     if use_bucket_server:
-        bucket_server = http.ThreadingBucketServer(('', 0), default_dir)
+        bucket_server = httpmrs.ThreadingBucketServer(('', 0), default_dir)
         _, bucket_port = bucket_server.socket.getsockname()
         bucket_proc = multiprocessing.Process(
                 target=bucket_server.serve_forever, name='Bucket Server')

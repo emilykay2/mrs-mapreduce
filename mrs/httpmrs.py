@@ -35,24 +35,24 @@ import sys
 import threading
 import time
 
-try:
-    from http.client import HTTPConnection
-    from http.server import SimpleHTTPRequestHandler
-    from urllib.parse import urlsplit, urlunsplit, unquote
-    import queue
-    import socketserver
-    from xmlrpc.client import ServerProxy, Transport
-    from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
-except ImportError:
-    from httplib import HTTPConnection
-    from SimpleHTTPServer import SimpleHTTPRequestHandler
-    from SimpleXMLRPCServer import (SimpleXMLRPCRequestHandler,
-            SimpleXMLRPCServer)
-    import Queue as queue
-    import SocketServer as socketserver
-    from urllib import unquote
-    from urlparse import urlsplit, urlunsplit
-    from xmlrpclib import ServerProxy, Transport
+# try:
+from http.client import HTTPConnection
+from http.server import SimpleHTTPRequestHandler
+from urllib.parse import urlsplit, urlunsplit, unquote
+import queue
+import socketserver
+from xmlrpc.client import ServerProxy, Transport
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
+# except ImportError:
+    # from httplib import HTTPConnection
+    # from SimpleHTTPServer import SimpleHTTPRequestHandler
+    # from SimpleXMLRPCServer import (SimpleXMLRPCRequestHandler,
+            # SimpleXMLRPCServer)
+    # import Queue as queue
+    # import SocketServer as socketserver
+    # from urllib import unquote
+    # from urlparse import urlsplit, urlunsplit
+    # from xmlrpclib import ServerProxy, Transport
 
 import logging
 logger = logging.getLogger('mrs')
